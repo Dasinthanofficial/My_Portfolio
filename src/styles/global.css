@@ -1,0 +1,119 @@
+@import "tailwindcss";
+
+@theme {
+  /* --- COLORS --- */
+  /* Usage: bg-bg0, text-bg0, border-bg0 */
+  --color-bg0: #0B0014;
+  --color-bg1: #1A0626;
+  --color-bg2: #3A0B55;
+
+  /* Usage: text-accent, bg-accent */
+  --color-accent: #A43AD9;
+  --color-accent-glow: #A43AD9;
+
+  /* Usage: text-text-main, text-text-muted */
+  --color-text-main: #EDE6F7;
+  --color-text-muted: #B8A7C9;
+
+  /* Glass Effects */
+  --color-glass-bg: rgba(26, 6, 38, 0.4);
+  --color-glass-border: rgba(255, 255, 255, 0.08);
+
+  /* --- FONTS --- */
+  /* Usage: font-heading, font-body */
+  --font-heading: "Space Grotesk", sans-serif;
+  --font-body: "Inter", sans-serif;
+
+  /* --- RADIUS --- */
+  /* Usage: rounded-container, rounded-pill */
+  --radius-container: 32px;
+  --radius-card: 24px;
+  --radius-pill: 99px;
+
+  /* --- SHADOWS --- */
+  /* Usage: shadow-neon, shadow-glass */
+  --shadow-neon: 0 0 15px rgba(164, 58, 217, 0.3);
+  --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+
+  /* --- BLUR --- */
+  /* Usage: backdrop-blur-glass */
+  --blur-glass: 20px;
+
+  /* --- ANIMATIONS --- */
+  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  
+  @keyframes floatSphere {
+    0% { transform: translateY(-10px); }
+    100% { transform: translateY(10px); }
+  }
+
+  /* --- GRADIENTS --- */
+  /* Usage: bg-gradient-text, bg-gradient-card */
+  --background-image-gradient-text: linear-gradient(135deg, #fff 0%, #dbb2ff 50%, #A43AD9 100%);
+  --background-image-gradient-card: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0) 100%);
+  --background-image-body-gradient: 
+    radial-gradient(circle at 15% 50%, rgba(164, 58, 217, 0.08) 0%, transparent 25%),
+    radial-gradient(circle at 85% 30%, rgba(58, 11, 85, 0.15) 0%, transparent 25%);
+}
+
+/* --- BASE STYLES --- */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 120px;
+  }
+
+  body {
+    /* Applying theme variables directly to body */
+    background-color: var(--color-bg0);
+    color: var(--color-text-main);
+    font-family: var(--font-body);
+    background-image: var(--background-image-body-gradient);
+    background-attachment: fixed;
+    min-height: 100vh;
+    overflow-x: hidden;
+    cursor: none; /* For your custom cursor */
+  }
+
+  /* Global Scrollbar */
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: var(--color-bg0); }
+  ::-webkit-scrollbar-thumb { 
+    background: var(--color-bg2); 
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: var(--color-accent); }
+  
+  ::selection { 
+    background: rgba(164, 58, 217, 0.4); 
+    color: white; 
+  }
+}
+
+/* --- UTILITY CLASSES --- */
+@layer utilities {
+  .hover-lift {
+    transition-property: transform;
+    transition-duration: 300ms;
+    transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .hover-lift:hover {
+    transform: translateY(-4px);
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all 1s ease-out;
+  }
+  
+  .reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  /* Helper for custom variable inside arbitary values in JSX if needed */
+  .text-shadow-neon {
+    text-shadow: 0 0 10px var(--color-accent);
+  }
+}
