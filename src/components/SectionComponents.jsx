@@ -1,105 +1,47 @@
-// import React from 'react';
-
-// export const GlassCard = ({ children, className = '', style, hoverEffect = false }) => {
-//     return (
-//         <div
-//             className={`glass-card ${className} ${hoverEffect ? 'hover-lift' : ''}`}
-//             style={{
-//                 background: 'var(--glass-bg)',
-//                 backdropFilter: 'blur(var(--glass-blur))',
-//                 WebkitBackdropFilter: 'blur(var(--glass-blur))',
-//                 border: '1px solid var(--glass-border)',
-//                 borderRadius: 'var(--radius-card)',
-//                 padding: '32px',
-//                 boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.3)',
-//                 transition: 'all 0.6s cubic-bezier(0.23, 1, 0.32, 1)',
-//                 position: 'relative',
-//                 overflow: 'hidden',
-//                 ...style
-//             }}
-//         >
-//             {/* Dynamic Inner Glow */}
-//             <div style={{
-//                 position: 'absolute',
-//                 top: 0, left: 0, width: '100%', height: '100%',
-//                 background: 'var(--gradient-card)',
-//                 pointerEvents: 'none',
-//                 opacity: 0.5,
-//                 zIndex: 0
-//             }} />
-//             <div style={{ position: 'relative', zIndex: 1 }}>
-//                 {children}
-//             </div>
-//         </div>
-//     );
-// };
-
-// export const SectionTitle = ({ title, subtitle, centered = true, id }) => {
-//     return (
-//         <div style={{
-//             textAlign: centered ? 'center' : 'left',
-//             marginBottom: '60px',
-//             position: 'relative',
-//             zIndex: 1
-//         }} id={id}>
-//             {subtitle && (
-//                 <span style={{
-//                     display: 'block',
-//                     color: 'var(--accent-primary)',
-//                     fontSize: '14px',
-//                     fontWeight: '700',
-//                     letterSpacing: '3px',
-//                     marginBottom: '12px',
-//                     textTransform: 'uppercase',
-//                     textShadow: '0 0 10px rgba(164, 58, 217, 0.5)'
-//                 }}>
-//                     {subtitle}
-//                 </span>
-//             )}
-//             <h2 style={{
-//                 fontSize: '48px',
-//                 fontWeight: '800',
-//                 color: 'white',
-//                 margin: 0,
-//                 letterSpacing: '-1px',
-//                 textShadow: '0 2px 20px rgba(164, 58, 217, 0.3)'
-//             }}>
-//                 {title}
-//             </h2>
-//             {/* Soft glow behind title */}
-//             <div style={{
-//                 position: 'absolute',
-//                 top: '50%',
-//                 left: centered ? '50%' : '0',
-//                 transform: 'translate(-50%, -50%)',
-//                 width: '300px',
-//                 height: '100px',
-//                 background: 'radial-gradient(ellipse at center, rgba(164, 58, 217, 0.25) 0%, transparent 70%)',
-//                 filter: 'blur(50px)',
-//                 zIndex: -1,
-//                 pointerEvents: 'none'
-//             }}></div>
-//         </div>
-//     );
-// };
 import React from 'react';
+// 1. Import Tilt
+import { Tilt } from 'react-tilt';
 
 export const GlassCard = ({ children, className = '', hoverEffect = false, ...props }) => {
-    return (
+    // Configuration for the tilt effect
+    const defaultOptions = {
+        reverse:        false,  // reverse the tilt direction
+        max:            15,     // max tilt rotation (degrees)
+        perspective:    1000,   // Transform perspective, the lower the more extreme the tilt gets.
+        scale:          1.02,   // 2 = 200%, 1.5 = 150%, etc..
+        speed:          1000,   // Speed of the enter/exit transition
+        transition:     true,   // Set a transition on enter/exit.
+        axis:           null,   // What axis should be disabled. Can be X or Y.
+        reset:          true,   // If the tilt effect has to be reset on exit.
+        easing:         "cubic-bezier(.03,.98,.52,.99)",    // Easing on enter/exit.
+    }
+
+    const CardContent = (
         <div
             className={`
                 bg-glass-bg backdrop-blur-glass border border-glass-border rounded-card p-8 
                 shadow-glass relative overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]
-                ${hoverEffect ? 'hover-lift' : ''} 
+                ${hoverEffect ? 'hover:border-accent/30' : ''} 
                 ${className}
             `}
             {...props}
         >
+            {/* Dynamic Inner Glow */}
             <div className="absolute inset-0 bg-gradient-card pointer-events-none opacity-50 z-0" />
-            <div className="relative z-10">
+            
+            <div className="relative z-10 h-full">
                 {children}
             </div>
         </div>
+    );
+
+    // Only apply Tilt if hoverEffect is true
+    return hoverEffect ? (
+        <Tilt options={defaultOptions} className="h-full">
+            {CardContent}
+        </Tilt>
+    ) : (
+        CardContent
     );
 };
 
@@ -111,7 +53,7 @@ export const SectionTitle = ({ title, subtitle, centered = true, id }) => {
         >
             {subtitle && (
                 <span className="block text-accent text-sm font-bold tracking-[3px] mb-3 uppercase 
-                               drop-shadow-[0_0_10px_rgba(164,58,217,0.5)]">
+                               drop-shadow-[0_0_10px_rgba(164,58,217,0.5)] animate-pulse">
                     {subtitle}
                 </span>
             )}
@@ -121,6 +63,7 @@ export const SectionTitle = ({ title, subtitle, centered = true, id }) => {
                 {title}
             </h2>
 
+            {/* Soft glow behind title */}
             <div className={`
                 absolute top-1/2 -translate-y-1/2 w-[300px] h-[100px] 
                 bg-[radial-gradient(ellipse_at_center,rgba(164,58,217,0.25)_0%,transparent_70%)] 

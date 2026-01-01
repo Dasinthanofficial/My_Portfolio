@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 
 const Navbar = () => {
-    // UPDATED: Added 'Certifications' to the navigation links
     const links = [
         { name: 'Home', id: 'home' },
         { name: 'About', id: 'about' },
         { name: 'Skills', id: 'skills' },
-        { name: 'Certifications', id: 'certifications' }, // New Link
+        { name: 'Certifications', id: 'certifications' },
         { name: 'Services', id: 'services' },
         { name: 'My Projects', id: 'my-projects' },
     ];
@@ -27,11 +26,11 @@ const Navbar = () => {
         return () => window.removeEventListener('scroll', handleProgress);
     }, []);
 
-    // 2. ACTIVE SECTION LOGIC
+    // 2. SCROLL SPY LOGIC
     useEffect(() => {
         const observerOptions = {
             root: null,
-            rootMargin: '-45% 0px -45% 0px', 
+            rootMargin: '-40% 0px -40% 0px', 
             threshold: 0
         };
 
@@ -50,7 +49,6 @@ const Navbar = () => {
             if (element) observer.observe(element);
         });
 
-        // Also observe contact section
         const contactEl = document.getElementById('contact');
         if (contactEl) observer.observe(contactEl);
 
@@ -75,17 +73,34 @@ const Navbar = () => {
                           bg-glass-bg backdrop-blur-glass border border-glass-border shadow-glass 
                           rounded-pill z-[9999]">
 
-                {/* Logo */}
-                <div className="flex items-center gap-3 z-10 group cursor-pointer" onClick={(e) => handleNavClick(e, 'home')}>
-                    <div className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center 
-                                  bg-gradient-to-br from-white/10 to-white/5 shadow-neon 
-                                  group-hover:scale-110 transition-transform duration-300">
-                        <span className="text-lg font-bold text-white font-heading">S</span>
+                {/* --- FIXED LOGO ANIMATION --- */}
+                <div 
+                    className="flex items-center z-50 cursor-pointer group" 
+                    onClick={(e) => handleNavClick(e, 'home')}
+                >
+                    <div className="relative h-10 rounded-full border border-white/20 bg-gradient-to-br from-white/10 to-white/5 shadow-neon 
+                                    flex items-center transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] overflow-hidden
+                                    w-10 group-hover:w-[135px] hover:border-accent/50">
+                        
+                        {/* The 'D' (Fixed Position) */}
+                        <div className="absolute left-0 w-10 h-10 flex items-center justify-center">
+                            <span className="text-lg font-bold text-white font-heading group-hover:text-accent transition-colors">
+                                D
+                            </span>
+                        </div>
+                        
+                        {/* The Name (Fade In with Reduced Padding) */}
+                        {/* UPDATED: Changed pl-11 to pl-10 to decrease space */}
+                        <div className="pl-10 pr-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <span className="text-[15px] font-bold text-white whitespace-nowrap tracking-wide font-heading">
+                                asinthan
+                            </span>
+                        </div>
                     </div>
                 </div>
 
                 {/* Desktop Links */}
-                <ul className="hidden md:flex gap-8 lg:gap-10 list-none m-0 p-0">
+                <ul className="hidden md:flex gap-6 lg:gap-10 list-none m-0 p-0">
                     {links.map((link) => {
                         const isActive = activeSection === link.id;
                         return (
@@ -93,7 +108,7 @@ const Navbar = () => {
                                 <a 
                                     href={`#${link.id}`} 
                                     onClick={(e) => handleNavClick(e, link.id)}
-                                    className={`text-[14px] lg:text-[15px] font-medium tracking-wide relative transition-colors duration-300
+                                    className={`text-[13px] lg:text-[15px] font-medium tracking-wide relative transition-colors duration-300
                                               ${isActive 
                                                 ? 'text-white font-semibold drop-shadow-[0_0_12px_rgba(164,58,217,0.8)]' 
                                                 : 'text-text-muted hover:text-white'
@@ -112,7 +127,6 @@ const Navbar = () => {
 
                 {/* Right Actions */}
                 <div className="flex gap-4 items-center z-10">
-                    {/* Contact Button (Desktop) */}
                     <a href="#contact" 
                        onClick={(e) => handleNavClick(e, 'contact')} 
                        className="hidden md:inline-flex px-6 py-2.5 bg-accent/20 border border-accent/40 rounded-pill 
@@ -121,11 +135,9 @@ const Navbar = () => {
                         Contact Me
                     </a>
                     
-                    {/* Mobile Toggle */}
                     <button 
                         className="md:hidden text-white text-2xl bg-transparent border-none cursor-pointer p-1" 
                         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                        aria-label="Toggle menu"
                     >
                         {isMobileMenuOpen ? '✕' : '☰'}
                     </button>
@@ -145,7 +157,6 @@ const Navbar = () => {
                            transition-all duration-400 ease-[cubic-bezier(0.23,1,0.32,1)]
                            ${isMobileMenuOpen ? 'translate-y-0 opacity-100 pointer-events-auto' : '-translate-y-full opacity-0 pointer-events-none'}`}>
                 
-                {/* Background Click to Close */}
                 <div className="absolute inset-0" onClick={() => setIsMobileMenuOpen(false)}></div>
 
                 <ul className="relative z-10 flex flex-col gap-8 text-center list-none p-0">
