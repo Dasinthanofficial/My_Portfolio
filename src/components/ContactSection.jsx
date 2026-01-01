@@ -21,7 +21,7 @@ export const ContactSection = () => {
             setIsSubmitting(false);
             setIsSent(true);
             setFormData({ name: '', email: '', message: '' });
-            
+
             // Reset success message after 5 seconds
             setTimeout(() => setIsSent(false), 5000);
         }, 1500);
@@ -32,7 +32,7 @@ export const ContactSection = () => {
             <SectionTitle title="Get In Touch" subtitle="Contact Me" />
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 max-w-6xl mx-auto items-start">
-                
+
                 {/* LEFT SIDE: Contact Info */}
                 <div className="flex flex-col gap-8 lg:mt-5">
                     <div>
@@ -43,7 +43,7 @@ export const ContactSection = () => {
                             </span>
                         </h3>
                         <p className="text-text-muted text-lg leading-relaxed max-w-md">
-                            I'm actively looking for internship opportunities. 
+                            I'm actively looking for internship opportunities.
                             Whether you have a project in mind or just want to connect, feel free to drop me a message!
                         </p>
                     </div>
@@ -57,7 +57,7 @@ export const ContactSection = () => {
                             <div>
                                 <span className="block text-sm text-text-muted font-medium uppercase tracking-wider">Email Me</span>
                                 <a href="mailto:your.email@example.com" className="text-xl text-white font-semibold hover:text-accent transition-colors">
-                                    your.email@example.com
+                                    dasinthanpathmanathan984@gmail.com
                                 </a>
                             </div>
                         </div>
@@ -69,7 +69,8 @@ export const ContactSection = () => {
                             </div>
                             <div>
                                 <span className="block text-sm text-text-muted font-medium uppercase tracking-wider">Location</span>
-                                <span className="text-xl text-white font-semibold">India</span>
+                                {/* UPDATED LOCATION HERE */}
+                                <span className="text-xl text-white font-semibold">Sri Lanka</span>
                             </div>
                         </div>
                     </div>
@@ -82,7 +83,7 @@ export const ContactSection = () => {
 
                 {/* RIGHT SIDE: Interactive Form */}
                 <GlassCard className="relative overflow-hidden border-t border-l border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.4)]">
-                    
+
                     {/* Success Overlay */}
                     {isSent && (
                         <div className="absolute inset-0 z-20 bg-bg0/90 backdrop-blur-md flex flex-col items-center justify-center text-center p-8 animate-[fadeIn_0.5s_ease-out]">
@@ -95,14 +96,14 @@ export const ContactSection = () => {
                     )}
 
                     <form onSubmit={handleSubmit} className="flex flex-col gap-6 relative z-10">
-                        
+
                         {/* Name Input */}
                         <div className="group">
                             <label className="block text-sm font-bold text-text-muted uppercase tracking-wider mb-2 group-focus-within:text-accent transition-colors">
                                 Your Name
                             </label>
-                            <input 
-                                type="text" 
+                            <input
+                                type="text"
                                 name="name"
                                 value={formData.name}
                                 onChange={handleChange}
@@ -117,8 +118,8 @@ export const ContactSection = () => {
                             <label className="block text-sm font-bold text-text-muted uppercase tracking-wider mb-2 group-focus-within:text-accent transition-colors">
                                 Your Email
                             </label>
-                            <input 
-                                type="email" 
+                            <input
+                                type="email"
                                 name="email"
                                 value={formData.email}
                                 onChange={handleChange}
@@ -133,7 +134,7 @@ export const ContactSection = () => {
                             <label className="block text-sm font-bold text-text-muted uppercase tracking-wider mb-2 group-focus-within:text-accent transition-colors">
                                 Message
                             </label>
-                            <textarea 
+                            <textarea
                                 name="message"
                                 value={formData.message}
                                 onChange={handleChange}
@@ -146,9 +147,9 @@ export const ContactSection = () => {
 
                         {/* Submit Button */}
                         <div className="pt-2">
-                            <Button 
-                                type="submit" 
-                                variant="primary" 
+                            <Button
+                                type="submit"
+                                variant="primary"
                                 className={`w-full group ${isSubmitting ? 'opacity-70 cursor-wait' : ''}`}
                                 disabled={isSubmitting}
                             >
@@ -162,7 +163,7 @@ export const ContactSection = () => {
                                     </span>
                                 ) : (
                                     <>
-                                        Send Message 
+                                        Send Message
                                         <FaPaperPlane className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
                                     </>
                                 )}
@@ -171,7 +172,7 @@ export const ContactSection = () => {
                     </form>
                 </GlassCard>
             </div>
-            
+
             <style>{`
                 @keyframes fadeIn {
                     from { opacity: 0; transform: scale(0.95); }

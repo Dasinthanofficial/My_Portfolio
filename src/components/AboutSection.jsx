@@ -1,6 +1,6 @@
 import React from 'react';
 import { GlassCard, SectionTitle } from './SectionComponents';
-
+import profile from '../assets/profile1.png';
 const AboutSection = () => {
     return (
         <section className="px-5 pb-20 pt-0 md:px-20 md:pb-24" id="about">
@@ -14,7 +14,7 @@ const AboutSection = () => {
                         <div className="shrink-0 w-[220px] h-[220px] rounded-[20px] bg-gradient-to-br from-accent to-accent/50 p-[3px] shadow-neon">
                             <img
                                 // Ideally, replace this with your actual photo
-                                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face"
+                                src={profile}
                                 alt="Profile"
                                 className="w-full h-full object-cover rounded-[18px] block"
                             />
