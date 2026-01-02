@@ -8,15 +8,15 @@ const CertificationsSection = () => {
         {
             title: "Responsive Web Design",
             issuer: "freeCodeCamp",
-            date: "Issued 2024",
-            link: "https://www.freecodecamp.org/", // Add your link here
+            date: "Issued 2025",
+            link: "https://www.freecodecamp.org/certification/fcc73a48fc0-d0e1-43ec-bf72-e3dea70380ba/responsive-web-design", // Add your link here
             icon: <FaFreeCodeCamp />,
             color: "text-white"
         },
         {
             title: "Google Sheets",
             issuer: "Alison",
-            date: "Issued 2024",
+            date: "Issued 2025",
             link: "https://alison.com/", // Add your link here
             icon: <SiGooglesheets />,
             color: "text-[#34A853]" // Google Sheets Green
