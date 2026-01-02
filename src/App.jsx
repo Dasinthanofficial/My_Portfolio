@@ -1,4 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useLayoutEffect } from 'react';
+import { Routes, Route, Outlet, useLocation, useNavigate } from 'react-router-dom';
+
 import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
 import AboutSection from './components/AboutSection';
@@ -12,19 +14,28 @@ import BackgroundAura from './components/BackgroundAura';
 import GalaxyBackground from './components/GalaxyBackground';
 import CertificationsSection from './components/CertificationsSection';
 
-function App() {
-  useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('active');
-        }
-      });
-    }, { threshold: 0.1 });
+function getNavOffset() {
+  return window.innerWidth >= 768 ? 120 : 110; // md+:120, else 110
+}
 
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+// Layout wraps common UI for every route
+function Layout() {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.state?.scrollTo) return;
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, [location.pathname, location.state]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => entries.forEach((entry) => entry.isIntersecting && entry.target.classList.add('active')),
+      { threshold: 0.1 }
+    );
+
+    document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
     return () => observer.disconnect();
-  }, []);
+  }, [location.pathname]);
 
   return (
     <>
@@ -34,18 +45,108 @@ function App() {
       <Navbar />
 
       <ContainerPanel>
-        <div className="main-content">
-          <HeroSection />
-          <div className="reveal"><AboutSection /></div>
-          <div className="reveal"><SkillsSection /></div>
-          <div className="reveal"><CertificationsSection /></div>
-          <div className="reveal"><ServicesSection /></div>
-          <div className="reveal"><ProjectsSection /></div>
-          <div className="reveal"><ContactSection /></div>
-        </div>
+        {/* pushes all pages below fixed navbar */}
+        <main className="pt-[110px] md:pt-[120px]">
+          <div className="main-content">
+            <Outlet />
+          </div>
+        </main>
       </ContainerPanel>
     </>
   );
 }
 
-export default App;
+function HomePage() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useLayoutEffect(() => {
+    const targetId = location.state?.scrollTo;
+    if (!targetId) return;
+
+    let tries = 0;
+
+    const scrollNow = () => {
+      const navHeight = getNavOffset();
+
+      if (targetId === 'home') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        navigate(location.pathname, { replace: true, state: {} });
+        return true;
+      }
+
+      const el = document.getElementById(targetId);
+      if (!el) return false;
+
+      const y = el.getBoundingClientRect().top + window.scrollY - navHeight;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+
+      navigate(location.pathname, { replace: true, state: {} });
+      return true;
+    };
+
+    if (scrollNow()) return;
+
+    const timer = setInterval(() => {
+      tries += 1;
+      if (scrollNow() || tries >= 25) clearInterval(timer);
+    }, 50);
+
+    return () => clearInterval(timer);
+  }, [location.key, location.pathname, location.state, navigate]);
+
+  return (
+    <>
+      <HeroSection />
+      <div className="reveal"><AboutSection /></div>
+      <div className="reveal"><SkillsSection /></div>
+
+      <div className="reveal">
+        <CertificationsSection limit={2} showViewMore />
+      </div>
+
+      <div className="reveal"><ServicesSection /></div>
+
+      <div className="reveal">
+        <ProjectsSection limit={3} showViewMore />
+      </div>
+
+      <div className="reveal"><ContactSection /></div>
+    </>
+  );
+}
+
+function ProjectsPage() {
+  return (
+    <div className="reveal">
+      <ProjectsSection title="All Projects" subtitle="Full List" />
+    </div>
+  );
+}
+
+function CertificationsPage() {
+  return (
+    <div className="reveal">
+      <CertificationsSection
+        title="All Certifications"
+        subtitle="Credentials"
+        // ✅ reduced top padding only for this page
+        sectionClassName="px-6 pt-6 pb-14 md:px-20 md:pt-8 md:pb-20"
+        // ✅ reduce title bottom gap
+        titleClassName="mb-10"
+      />
+    </div>
+  );
+}
+
+export default function App() {
+  return (
+    <Routes>
+      <Route element={<Layout />}>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/projects" element={<ProjectsPage />} />
+        <Route path="/certifications" element={<CertificationsPage />} />
+      </Route>
+    </Routes>
+  );
+}

@@ -1,87 +1,86 @@
 import React, { useEffect, useState } from 'react';
 
 const CustomCursor = () => {
-    const [position, setPosition] = useState({ x: 0, y: 0 });
-    const [clicked, setClicked] = useState(false);
-    const [linkHovered, setLinkHovered] = useState(false);
-    const [hidden, setHidden] = useState(true);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [clicked, setClicked] = useState(false);
+  const [linkHovered, setLinkHovered] = useState(false);
+  const [hidden, setHidden] = useState(true);
 
-    useEffect(() => {
-        const addEventListeners = () => {
-            document.addEventListener("mousemove", onMouseMove);
-            document.addEventListener("mouseenter", onMouseEnter);
-            document.addEventListener("mouseleave", onMouseLeave);
-            document.addEventListener("mousedown", onMouseDown);
-            document.addEventListener("mouseup", onMouseUp);
-        };
+  useEffect(() => {
+    const onMouseMove = (e) => {
+      setPosition({ x: e.clientX, y: e.clientY });
+      setHidden(false);
+    };
 
-        const removeEventListeners = () => {
-            document.removeEventListener("mousemove", onMouseMove);
-            document.removeEventListener("mouseenter", onMouseEnter);
-            document.removeEventListener("mouseleave", onMouseLeave);
-            document.removeEventListener("mousedown", onMouseDown);
-            document.removeEventListener("mouseup", onMouseUp);
-        };
+    const onMouseDown = () => setClicked(true);
+    const onMouseUp = () => setClicked(false);
+    const onMouseLeave = () => setHidden(true);
+    const onMouseEnter = () => setHidden(false);
 
-        const onMouseMove = (e) => {
-            setPosition({ x: e.clientX, y: e.clientY });
-            setHidden(false);
-        };
+    // Event delegation: no per-element listeners (prevents leaks)
+    const onPointerOver = (e) => {
+      const interactive = e.target?.closest?.('a, button, .cursor-pointer, input, textarea, select, label');
+      if (interactive) setLinkHovered(true);
+    };
+    const onPointerOut = (e) => {
+      const stillInteractive = e.relatedTarget?.closest?.('a, button, .cursor-pointer, input, textarea, select, label');
+      if (!stillInteractive) setLinkHovered(false);
+    };
 
-        const onMouseDown = () => setClicked(true);
-        const onMouseUp = () => setClicked(false);
-        const onMouseLeave = () => setHidden(true);
-        const onMouseEnter = () => setHidden(false);
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseenter', onMouseEnter);
+    document.addEventListener('mouseleave', onMouseLeave);
+    document.addEventListener('mousedown', onMouseDown);
+    document.addEventListener('mouseup', onMouseUp);
+    document.addEventListener('pointerover', onPointerOver);
+    document.addEventListener('pointerout', onPointerOut);
 
-        // Add listeners to interactive elements
-        const handleLinkHoverEvents = () => {
-            document.querySelectorAll("a, button, .cursor-pointer, input, textarea").forEach((el) => {
-                el.addEventListener("mouseover", () => setLinkHovered(true));
-                el.addEventListener("mouseout", () => setLinkHovered(false));
-            });
-        };
+    return () => {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseenter', onMouseEnter);
+      document.removeEventListener('mouseleave', onMouseLeave);
+      document.removeEventListener('mousedown', onMouseDown);
+      document.removeEventListener('mouseup', onMouseUp);
+      document.removeEventListener('pointerover', onPointerOver);
+      document.removeEventListener('pointerout', onPointerOut);
+    };
+  }, []);
 
-        addEventListeners();
-        handleLinkHoverEvents();
+  const cursorClasses = `
+    fixed top-0 left-0 rounded-full pointer-events-none z-[9999]
+    border-2 transition-all duration-300 ease-out hidden md:block
+    ${hidden ? 'opacity-0' : 'opacity-100'}
+    ${
+      linkHovered
+        ? 'w-[60px] h-[60px] bg-accent/15 border-accent/80 backdrop-blur-[4px]'
+        : 'w-[30px] h-[30px] bg-transparent border-accent/50'
+    }
+  `;
 
-        return () => removeEventListeners();
-    }, []);
+  const dotClasses = `
+    fixed top-0 left-0 w-1.5 h-1.5 bg-accent rounded-full pointer-events-none z-[100000]
+    hidden md:block
+    ${hidden ? 'opacity-0' : 'opacity-100'}
+  `;
 
-    // 1. Main Ring Style
-    // We use hidden md:block to hide custom cursor on mobile (touch devices don't have cursors)
-    const cursorClasses = `
-        fixed top-0 left-0 rounded-full pointer-events-none z-[9999]
-        border-2 transition-all duration-300 ease-out hidden md:block
-        ${hidden ? 'opacity-0' : 'opacity-100'}
-        ${linkHovered 
-            ? 'w-[60px] h-[60px] bg-accent/15 border-accent/80 backdrop-blur-[4px]' 
-            : 'w-[30px] h-[30px] bg-transparent border-accent/50'
-        }
-    `;
-
-    // 2. Center Dot Style
-    const dotClasses = `
-        fixed top-0 left-0 w-1.5 h-1.5 bg-accent rounded-full pointer-events-none z-[100000]
-        hidden md:block
-        ${hidden ? 'opacity-0' : 'opacity-100'}
-    `;
-
-    return (
-        <>
-            <div 
-                className={cursorClasses}
-                style={{
-                    transform: `translate3d(${position.x}px, ${position.y}px, 0) translate(-50%, -50%) scale(${clicked ? 0.8 : 1})`
-                }}
-            />
-            <div 
-                className={dotClasses}
-                style={{
-                    transform: `translate3d(${position.x}px, ${position.y}px, 0) translate(-50%, -50%)`
-                }}
-            />
-        </>
-    );
+  return (
+    <>
+      <div
+        className={cursorClasses}
+        style={{
+          transform: `translate3d(${position.x}px, ${position.y}px, 0) translate(-50%, -50%) scale(${
+            clicked ? 0.8 : 1
+          })`,
+        }}
+      />
+      <div
+        className={dotClasses}
+        style={{
+          transform: `translate3d(${position.x}px, ${position.y}px, 0) translate(-50%, -50%)`,
+        }}
+      />
+    </>
+  );
 };
 
 export default CustomCursor;
