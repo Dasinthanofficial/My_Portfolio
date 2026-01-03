@@ -22,11 +22,13 @@ function getNavOffset() {
 function Layout() {
   const location = useLocation();
 
+  // Scroll to top on route changes (but NOT when navigating home to scroll to a section)
   useEffect(() => {
     if (location.state?.scrollTo) return;
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }, [location.pathname, location.state]);
 
+  // Reveal animation re-init on route change
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => entries.forEach((entry) => entry.isIntersecting && entry.target.classList.add('active')),
@@ -45,7 +47,7 @@ function Layout() {
       <Navbar />
 
       <ContainerPanel>
-        {/* pushes all pages below fixed navbar */}
+        {/* Global offset so fixed navbar never covers page top */}
         <main className="pt-[110px] md:pt-[120px]">
           <div className="main-content">
             <Outlet />
@@ -60,6 +62,8 @@ function HomePage() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  // When coming from /projects or /certifications and clicking a scroll-link in navbar,
+  // Navbar navigates to "/" with state.scrollTo => scroll after Home sections mount.
   useLayoutEffect(() => {
     const targetId = location.state?.scrollTo;
     if (!targetId) return;
@@ -81,6 +85,7 @@ function HomePage() {
       const y = el.getBoundingClientRect().top + window.scrollY - navHeight;
       window.scrollTo({ top: y, behavior: 'smooth' });
 
+      // clear state so it doesn't trigger again
       navigate(location.pathname, { replace: true, state: {} });
       return true;
     };
@@ -119,7 +124,13 @@ function HomePage() {
 function ProjectsPage() {
   return (
     <div className="reveal">
-      <ProjectsSection title="All Projects" subtitle="Full List" />
+      {/* ✅ FIX: add top padding + smaller title spacing for /projects page */}
+      <ProjectsSection
+        title="All Projects"
+        subtitle="Full List"
+        sectionClassName="px-5 pt-6 pb-20 md:px-20 md:pt-8 md:pb-24"
+        titleClassName="mb-10"
+      />
     </div>
   );
 }
@@ -130,9 +141,7 @@ function CertificationsPage() {
       <CertificationsSection
         title="All Certifications"
         subtitle="Credentials"
-        // ✅ reduced top padding only for this page
         sectionClassName="px-6 pt-6 pb-14 md:px-20 md:pt-8 md:pb-20"
-        // ✅ reduce title bottom gap
         titleClassName="mb-10"
       />
     </div>
