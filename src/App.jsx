@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect } from 'react';
+import React, { useEffect, useLayoutEffect, useRef } from 'react';
 import { Routes, Route, Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import Navbar from './components/Navbar';
@@ -15,18 +15,21 @@ import GalaxyBackground from './components/GalaxyBackground';
 import CertificationsSection from './components/CertificationsSection';
 
 function getNavOffset() {
-  return window.innerWidth >= 768 ? 120 : 110; // md+:120, else 110
+  return window.innerWidth >= 768 ? 120 : 110;
 }
 
-// Layout wraps common UI for every route
 function Layout() {
   const location = useLocation();
+  const prevKey = useRef(location.key);
 
-  // Scroll to top on route changes (but NOT when navigating home to scroll to a section)
+  // Scroll to top ONLY on real route changes, and never when scrollTo exists
   useEffect(() => {
+    if (prevKey.current === location.key) return;
+    prevKey.current = location.key;
+
     if (location.state?.scrollTo) return;
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-  }, [location.pathname, location.state]);
+  }, [location.key, location.state]);
 
   // Reveal animation re-init on route change
   useEffect(() => {
@@ -47,11 +50,8 @@ function Layout() {
       <Navbar />
 
       <ContainerPanel>
-        {/* Global offset so fixed navbar never covers page top */}
         <main className="pt-[110px] md:pt-[120px]">
-          <div className="main-content">
-            <Outlet />
-          </div>
+          <Outlet />
         </main>
       </ContainerPanel>
     </>
@@ -62,13 +62,12 @@ function HomePage() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // When coming from /projects or /certifications and clicking a scroll-link in navbar,
-  // Navbar navigates to "/" with state.scrollTo => scroll after Home sections mount.
   useLayoutEffect(() => {
     const targetId = location.state?.scrollTo;
     if (!targetId) return;
 
     let tries = 0;
+    const maxTries = 80; // more reliable on slow devices
 
     const scrollNow = () => {
       const navHeight = getNavOffset();
@@ -90,14 +89,20 @@ function HomePage() {
       return true;
     };
 
-    if (scrollNow()) return;
+    // wait 1 paint then try + retry
+    const raf = requestAnimationFrame(() => {
+      if (scrollNow()) return;
 
-    const timer = setInterval(() => {
-      tries += 1;
-      if (scrollNow() || tries >= 25) clearInterval(timer);
-    }, 50);
+      const timer = setInterval(() => {
+        tries += 1;
+        if (scrollNow() || tries >= maxTries) clearInterval(timer);
+      }, 50);
 
-    return () => clearInterval(timer);
+      // cleanup interval
+      return () => clearInterval(timer);
+    });
+
+    return () => cancelAnimationFrame(raf);
   }, [location.key, location.pathname, location.state, navigate]);
 
   return (
@@ -105,17 +110,9 @@ function HomePage() {
       <HeroSection />
       <div className="reveal"><AboutSection /></div>
       <div className="reveal"><SkillsSection /></div>
-
-      <div className="reveal">
-        <CertificationsSection limit={2} showViewMore />
-      </div>
-
+      <div className="reveal"><CertificationsSection limit={2} showViewMore /></div>
       <div className="reveal"><ServicesSection /></div>
-
-      <div className="reveal">
-        <ProjectsSection limit={3} showViewMore />
-      </div>
-
+      <div className="reveal"><ProjectsSection limit={3} showViewMore /></div>
       <div className="reveal"><ContactSection /></div>
     </>
   );
@@ -124,7 +121,6 @@ function HomePage() {
 function ProjectsPage() {
   return (
     <div className="reveal">
-      {/* ✅ FIX: add top padding + smaller title spacing for /projects page */}
       <ProjectsSection
         title="All Projects"
         subtitle="Full List"

@@ -10,6 +10,11 @@ const NAV_LINKS = [
   { name: 'My Projects', type: 'route', to: '/projects', activeWhen: ['my-projects'] },
 ];
 
+function getNavHeight() {
+  // match your Layout padding: pt-[110px] md:pt-[120px]
+  return window.innerWidth >= 768 ? 120 : 110;
+}
+
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -50,7 +55,8 @@ const Navbar = () => {
   const scrollToId = (id) => {
     const el = document.getElementById(id);
     if (!el) return;
-    const navHeight = 100;
+
+    const navHeight = getNavHeight();
     const offsetPosition = el.getBoundingClientRect().top + window.pageYOffset - navHeight;
     window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
   };
@@ -91,17 +97,24 @@ const Navbar = () => {
                    bg-glass-bg backdrop-blur-glass border border-glass-border shadow-glass
                    rounded-pill z-[9999]"
       >
-        <div className="flex items-center z-50 cursor-pointer group" onClick={(e) => handleNavClick(e, NAV_LINKS[0])}>
+        <div
+          className="flex items-center z-50 cursor-pointer group"
+          onClick={(e) => handleNavClick(e, NAV_LINKS[0])}
+        >
           <div
             className="relative h-10 rounded-full border border-white/20 bg-gradient-to-br from-white/10 to-white/5 shadow-neon
                        flex items-center transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] overflow-hidden
-                       w-10 group-hover:w-[135px] hover:border-accent/50"
+                       w-10 md:group-hover:w-[135px] hover:border-accent/50"
           >
             <div className="absolute left-0 w-10 h-10 flex items-center justify-center">
-              <span className="text-lg font-bold text-white font-heading group-hover:text-accent transition-colors">D</span>
+              <span className="text-lg font-bold text-white font-heading md:group-hover:text-accent transition-colors">
+                D
+              </span>
             </div>
-            <div className="pl-10 pr-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <span className="text-[15px] font-bold text-white whitespace-nowrap tracking-wide font-heading">asinthan</span>
+            <div className="pl-10 pr-4 opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
+              <span className="text-[15px] font-bold text-white whitespace-nowrap tracking-wide font-heading">
+                asinthan
+              </span>
             </div>
           </div>
         </div>
@@ -117,7 +130,11 @@ const Navbar = () => {
                   href={href}
                   onClick={(e) => handleNavClick(e, link)}
                   className={`text-[13px] lg:text-[15px] font-medium tracking-wide relative transition-colors duration-300
-                    ${active ? 'text-white font-semibold drop-shadow-[0_0_12px_rgba(164,58,217,0.8)]' : 'text-text-muted hover:text-white'}
+                    ${
+                      active
+                        ? 'text-white font-semibold drop-shadow-[0_0_12px_rgba(164,58,217,0.8)]'
+                        : 'text-text-muted hover:text-white'
+                    }
                     after:content-[''] after:absolute after:-bottom-1.5 after:left-1/2 after:-translate-x-1/2
                     after:h-[2px] after:bg-accent after:transition-all after:duration-300 after:rounded-sm
                     ${active ? 'after:w-full shadow-[0_0_8px_var(--accent-primary)]' : 'after:w-0 hover:after:w-full'}
@@ -153,6 +170,7 @@ const Navbar = () => {
           <button
             className="md:hidden text-white text-2xl bg-transparent border-none cursor-pointer p-1"
             onClick={() => setIsMobileMenuOpen((v) => !v)}
+            aria-label="Toggle mobile menu"
           >
             {isMobileMenuOpen ? '✕' : '☰'}
           </button>
@@ -184,7 +202,9 @@ const Navbar = () => {
                 <a
                   href={href}
                   onClick={(e) => handleNavClick(e, link)}
-                  className={`text-2xl font-bold no-underline transition-colors ${active ? 'text-accent' : 'text-white hover:text-accent/70'}`}
+                  className={`text-2xl font-bold no-underline transition-colors ${
+                    active ? 'text-accent' : 'text-white hover:text-accent/70'
+                  }`}
                 >
                   {link.name}
                 </a>
@@ -217,3 +237,5 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
+

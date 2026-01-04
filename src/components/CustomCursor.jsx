@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 const CustomCursor = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -6,7 +6,18 @@ const CustomCursor = () => {
   const [linkHovered, setLinkHovered] = useState(false);
   const [hidden, setHidden] = useState(true);
 
+  // Disable custom cursor entirely on touch / reduced motion
+  const disabled = useMemo(() => {
+    if (typeof window === 'undefined') return true;
+    const coarse = window.matchMedia('(pointer: coarse)').matches;
+    const noHover = window.matchMedia('(hover: none)').matches;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    return coarse || noHover || reduce;
+  }, []);
+
   useEffect(() => {
+    if (disabled) return;
+
     const onMouseMove = (e) => {
       setPosition({ x: e.clientX, y: e.clientY });
       setHidden(false);
@@ -17,17 +28,21 @@ const CustomCursor = () => {
     const onMouseLeave = () => setHidden(true);
     const onMouseEnter = () => setHidden(false);
 
-    // Event delegation: no per-element listeners (prevents leaks)
     const onPointerOver = (e) => {
-      const interactive = e.target?.closest?.('a, button, .cursor-pointer, input, textarea, select, label');
+      const interactive = e.target?.closest?.(
+        'a, button, .cursor-pointer, input, textarea, select, label'
+      );
       if (interactive) setLinkHovered(true);
     };
+
     const onPointerOut = (e) => {
-      const stillInteractive = e.relatedTarget?.closest?.('a, button, .cursor-pointer, input, textarea, select, label');
+      const stillInteractive = e.relatedTarget?.closest?.(
+        'a, button, .cursor-pointer, input, textarea, select, label'
+      );
       if (!stillInteractive) setLinkHovered(false);
     };
 
-    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mousemove', onMouseMove, { passive: true });
     document.addEventListener('mouseenter', onMouseEnter);
     document.addEventListener('mouseleave', onMouseLeave);
     document.addEventListener('mousedown', onMouseDown);
@@ -44,9 +59,12 @@ const CustomCursor = () => {
       document.removeEventListener('pointerover', onPointerOver);
       document.removeEventListener('pointerout', onPointerOut);
     };
-  }, []);
+  }, [disabled]);
+
+  if (disabled) return null;
 
   const cursorClasses = `
+    custom-cursor
     fixed top-0 left-0 rounded-full pointer-events-none z-[9999]
     border-2 transition-all duration-300 ease-out hidden md:block
     ${hidden ? 'opacity-0' : 'opacity-100'}
@@ -58,6 +76,7 @@ const CustomCursor = () => {
   `;
 
   const dotClasses = `
+    custom-dot
     fixed top-0 left-0 w-1.5 h-1.5 bg-accent rounded-full pointer-events-none z-[100000]
     hidden md:block
     ${hidden ? 'opacity-0' : 'opacity-100'}

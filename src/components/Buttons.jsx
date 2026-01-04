@@ -1,6 +1,7 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState } from "react";
 
-export const Button = ({ children, variant = 'primary', className = '', ...props }) => {
+/* ===================== BUTTON ===================== */
+export const Button = ({ children, variant = "primary", className = "", ...props }) => {
   const buttonRef = useRef(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
@@ -17,9 +18,9 @@ export const Button = ({ children, variant = 'primary', className = '', ...props
   const handleMouseLeave = () => setMousePos({ x: 0, y: 0 });
 
   const variants = {
-    primary: 'bg-accent text-white shadow-neon border border-white/20',
+    primary: "bg-accent text-white shadow-neon border border-white/20",
     secondary:
-      'bg-white/5 text-text-main border border-white/15 backdrop-blur shadow-[inset_0_0_12px_rgba(255,255,255,0.05)]',
+      "bg-white/5 text-text-main border border-white/15 backdrop-blur shadow-[inset_0_0_12px_rgba(255,255,255,0.05)]",
   };
 
   return (
@@ -31,8 +32,8 @@ export const Button = ({ children, variant = 'primary', className = '', ...props
       className={`
         px-9 py-3.5 rounded-pill text-base font-semibold inline-flex items-center justify-center gap-3
         transition-all duration-100 ease-out hover-lift cursor-pointer relative z-10
-        ${variants[variant] || variants.primary}
-        ${mousePos.x === 0 ? 'transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]' : ''}
+        ${variants[variant]}
+        ${mousePos.x === 0 ? "transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]" : ""}
         ${className}
       `}
       {...props}
@@ -47,18 +48,19 @@ export const Button = ({ children, variant = 'primary', className = '', ...props
   );
 };
 
+/* ===================== SOCIAL ROW ===================== */
 export const SocialRow = () => {
   const icons = [
     {
-      label: 'GitHub',
-      url: 'https://github.com/',
+      label: "GitHub",
+      url: "https://github.com/Dasinthanofficial",
       svg: (
         <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
       ),
     },
     {
-      label: 'LinkedIn',
-      url: '#',
+      label: "LinkedIn",
+      url: "https://www.linkedin.com/in/dasinthan-pathmanathan-725239389/",
       svg: (
         <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z M2 9h4v12H2z M4 4a2 2 0 1 0 0 4 2 2 0 0 0 0-4z" />
       ),
@@ -74,6 +76,7 @@ export const SocialRow = () => {
   );
 };
 
+/* ===================== MAGNETIC ICON ===================== */
 const MagneticIcon = ({ ic }) => {
   const iconRef = useRef(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -88,21 +91,27 @@ const MagneticIcon = ({ ic }) => {
     });
   };
 
+  // ✅ Use window.open for external links instead of <a> to avoid React Router issues
+  const handleClick = () => {
+    if (!ic.url) return;
+    window.open(ic.url, "_blank", "noopener,noreferrer");
+  };
+
   return (
-    <a
+    <div
       ref={iconRef}
+      role="button"
+      aria-label={ic.label}
+      onClick={handleClick}
       onMouseMove={handleMouseMove}
       onMouseLeave={() => setMousePos({ x: 0, y: 0 })}
-      href={ic.url}
-      aria-label={ic.label}
-      target={ic.url?.startsWith('http') ? '_blank' : undefined}
-      rel={ic.url?.startsWith('http') ? 'noopener noreferrer' : undefined}
       style={{ transform: `translate3d(${mousePos.x}px, ${mousePos.y}px, 0)` }}
-      className={`
-        w-[46px] h-[46px] rounded-full border border-white/10 flex items-center justify-center 
-        text-white bg-white/5 backdrop-blur-sm shadow-md cursor-pointer hover-lift
-        ${mousePos.x === 0 ? 'transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]' : 'duration-0'}
-      `}
+      className="
+        w-[46px] h-[46px] rounded-full border border-white/10
+        flex items-center justify-center text-white bg-white/5
+        backdrop-blur-sm shadow-md cursor-pointer hover-lift
+        transition-all duration-300
+      "
     >
       <span style={{ transform: `translate3d(${mousePos.x * 0.3}px, ${mousePos.y * 0.3}px, 0)` }}>
         <svg
@@ -118,6 +127,6 @@ const MagneticIcon = ({ ic }) => {
           {ic.svg}
         </svg>
       </span>
-    </a>
+    </div>
   );
 };

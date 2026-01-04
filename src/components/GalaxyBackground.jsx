@@ -56,18 +56,39 @@ const ParticleField = ({ count = 2000 }) => {
 };
 
 const GalaxyBackground = () => {
+  const isMobile = useMemo(
+    () => typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches,
+    []
+  );
+
+  const reduceMotion = useMemo(
+    () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    []
+  );
+
+  if (reduceMotion) {
+    return <div className="fixed inset-0 w-full h-full z-[-2] bg-bg0 pointer-events-none" />;
+  }
+
+  const starsCount = isMobile ? 1500 : 5000;
+  const pFloat = isMobile ? 900 : 3000;
+  const pStatic = isMobile ? 300 : 1000;
+
   return (
     <div className="fixed inset-0 w-full h-full z-[-2] bg-bg0 pointer-events-none">
-      <Canvas camera={{ position: [0, 0, 5], fov: 60 }}>
+      <Canvas
+        camera={{ position: [0, 0, 5], fov: 60 }}
+        dpr={isMobile ? 1 : [1, 1.5]}
+      >
         <ambientLight intensity={0.5} />
 
-        <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
+        <Stars radius={100} depth={50} count={starsCount} factor={4} saturation={0} fade speed={0.7} />
 
-        <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
-          <ParticleField count={3000} />
+        <Float speed={1.5} rotationIntensity={0.35} floatIntensity={0.35}>
+          <ParticleField count={pFloat} />
         </Float>
 
-        <ParticleField count={1000} />
+        <ParticleField count={pStatic} />
       </Canvas>
     </div>
   );

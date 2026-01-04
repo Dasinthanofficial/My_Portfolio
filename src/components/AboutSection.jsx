@@ -11,7 +11,13 @@ const AboutSection = () => {
         <GlassCard className="h-full">
           <div className="flex flex-col sm:flex-row gap-7 items-center sm:items-start">
             <div className="shrink-0 w-[220px] h-[220px] rounded-[20px] bg-gradient-to-br from-accent to-accent/50 p-[3px] shadow-neon">
-              <img src={profile} alt="Profile" className="w-full h-full object-cover rounded-[18px] block" />
+              <img
+                src={profile}
+                alt="Profile"
+                loading="lazy"
+                decoding="async"
+                className="w-full h-full object-cover rounded-[18px] block"
+              />
             </div>
 
             <div className="flex-1 text-center sm:text-left">

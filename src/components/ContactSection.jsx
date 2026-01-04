@@ -3,24 +3,43 @@ import { GlassCard, SectionTitle } from './SectionComponents';
 import { Button, SocialRow } from './Buttons';
 import { FaCheckCircle, FaEnvelope, FaMapMarkerAlt, FaPaperPlane } from 'react-icons/fa';
 
+const FORMSPREE_ENDPOINT = 'https://formspree.io/f/mdakykze'; 
 const ContactSection = () => {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSent, setIsSent] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (e) => setFormData((p) => ({ ...p, [e.target.name]: e.target.value }));
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
     setIsSubmitting(true);
 
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      const res = await fetch(FORMSPREE_ENDPOINT, {
+        method: 'POST',
+        headers: { Accept: 'application/json' },
+        body: new FormData(e.currentTarget),
+      });
+
+      if (!res.ok) {
+        setError('Failed to send message. Please try again or email me directly.');
+        setIsSubmitting(false);
+        return;
+      }
+
       setIsSent(true);
       setFormData({ name: '', email: '', message: '' });
 
+      // Hide success screen after 5s
       setTimeout(() => setIsSent(false), 5000);
-    }, 1500);
+    } catch (err) {
+      setError('Network error. Please try again or email me directly.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -70,7 +89,9 @@ const ContactSection = () => {
           </div>
 
           <div className="mt-4">
-            <span className="block text-sm text-text-muted font-medium uppercase tracking-wider mb-4">Connect Socially</span>
+            <span className="block text-sm text-text-muted font-medium uppercase tracking-wider mb-4">
+              Connect Socially
+            </span>
             <SocialRow />
           </div>
         </div>
@@ -87,6 +108,15 @@ const ContactSection = () => {
           )}
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-6 relative z-10">
+            {/* Formspree uses these field names fine */}
+            <input type="hidden" name="_subject" value="New message from portfolio contact form" />
+
+            {error && (
+              <div className="text-red-300 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 text-sm">
+                {error}
+              </div>
+            )}
+
             <div className="group">
               <label className="block text-sm font-bold text-text-muted uppercase tracking-wider mb-2 group-focus-within:text-accent transition-colors">
                 Your Name
@@ -141,9 +171,18 @@ const ContactSection = () => {
               >
                 {isSubmitting ? (
                   <span className="flex items-center gap-2">
-                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <svg
+                      className="animate-spin h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      />
                     </svg>
                     Sending...
                   </span>
@@ -156,15 +195,15 @@ const ContactSection = () => {
               </Button>
             </div>
           </form>
+
+          <style>{`
+            @keyframes fadeIn {
+              from { opacity: 0; transform: scale(0.95); }
+              to { opacity: 1; transform: scale(1); }
+            }
+          `}</style>
         </GlassCard>
       </div>
-
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: scale(0.95); }
-          to { opacity: 1; transform: scale(1); }
-        }
-      `}</style>
     </section>
   );
 };
