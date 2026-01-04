@@ -1,17 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const NAV_LINKS = [
-  { name: 'Home', type: 'route', to: '/', activeWhen: ['home'] },
-  { name: 'About', type: 'scroll', id: 'about', activeWhen: ['about'] },
-  { name: 'Skills', type: 'scroll', id: 'skills', activeWhen: ['skills'] },
-  { name: 'Certifications', type: 'route', to: '/certifications', activeWhen: ['certifications'] },
-  { name: 'Services', type: 'scroll', id: 'services', activeWhen: ['services'] },
-  { name: 'My Projects', type: 'route', to: '/projects', activeWhen: ['my-projects'] },
+  { name: 'Home', type: 'scroll', id: 'home' },            // scroll-to-top
+  { name: 'About', type: 'scroll', id: 'about' },
+  { name: 'Skills', type: 'scroll', id: 'skills' },
+  { name: 'Services', type: 'scroll', id: 'services' },
+  { name: 'Contact', type: 'scroll', id: 'contact' },
+
+  // These are real pages
+  { name: 'Certifications', type: 'route', to: '/certifications' },
+  { name: 'My Projects', type: 'route', to: '/projects' },
 ];
 
 function getNavHeight() {
-  // match your Layout padding: pt-[110px] md:pt-[120px]
   return window.innerWidth >= 768 ? 120 : 110;
 }
 
@@ -23,6 +25,13 @@ const Navbar = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  const observerRef = useRef(null);
+
+  const HOME_SECTION_IDS = useMemo(
+    () => ['home', 'about', 'skills', 'services', 'my-projects', 'contact'],
+    []
+  );
+
   useEffect(() => {
     const handleProgress = () => {
       const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
@@ -30,82 +39,98 @@ const Navbar = () => {
       if (height <= 0) return setScrollProgress(0);
       setScrollProgress((winScroll / height) * 100);
     };
-
     window.addEventListener('scroll', handleProgress, { passive: true });
     handleProgress();
     return () => window.removeEventListener('scroll', handleProgress);
   }, []);
 
+  // Observer only on "/"
   useEffect(() => {
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+      observerRef.current = null;
+    }
+
     if (location.pathname !== '/') return;
 
     const observer = new IntersectionObserver(
-      (entries) => entries.forEach((entry) => entry.isIntersecting && setActiveSection(entry.target.id)),
-      { root: null, rootMargin: '-40% 0px -40% 0px', threshold: 0 }
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => (b.intersectionRatio ?? 0) - (a.intersectionRatio ?? 0))[0];
+
+        if (visible?.target?.id) setActiveSection(visible.target.id);
+      },
+      { root: null, rootMargin: '-35% 0px -55% 0px', threshold: [0, 0.1, 0.2, 0.4, 0.6] }
     );
 
-    ['home', 'about', 'skills', 'certifications', 'services', 'my-projects', 'contact'].forEach((id) => {
+    HOME_SECTION_IDS.forEach((id) => {
       const el = document.getElementById(id);
       if (el) observer.observe(el);
     });
 
+    observerRef.current = observer;
     return () => observer.disconnect();
-  }, [location.pathname]);
+  }, [location.pathname, HOME_SECTION_IDS]);
 
   const scrollToId = (id) => {
+    const navHeight = getNavHeight();
+
+    if (id === 'home') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setActiveSection('home');
+      return;
+    }
+
     const el = document.getElementById(id);
     if (!el) return;
 
-    const navHeight = getNavHeight();
-    const offsetPosition = el.getBoundingClientRect().top + window.pageYOffset - navHeight;
-    window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+    const y = el.getBoundingClientRect().top + window.scrollY - navHeight;
+    window.scrollTo({ top: y, behavior: 'smooth' });
   };
 
   const handleNavClick = (e, link) => {
     e.preventDefault();
     setIsMobileMenuOpen(false);
 
+    // ROUTE links (open pages)
     if (link.type === 'route') {
-      if (link.to === '/' && location.pathname === '/') {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        return;
-      }
-      navigate(link.to);
+      navigate(link.to, { state: {} }); // clear state
       return;
     }
 
+    // SCROLL links (sections on home)
     const targetId = link.id;
+
     if (location.pathname !== '/') {
+      // go home then scroll (HomePage effect handles it)
       navigate('/', { state: { scrollTo: targetId } });
       return;
     }
+
     scrollToId(targetId);
   };
 
   const isLinkActive = (link) => {
-    if (location.pathname === '/projects') return link.to === '/projects';
-    if (location.pathname === '/certifications') return link.to === '/certifications';
-    if (location.pathname !== '/') return link.to === location.pathname;
-    return link.activeWhen?.includes(activeSection);
+    // Highlight route pages
+    if (link.type === 'route') return location.pathname === link.to;
+
+    // On home, highlight active section
+    if (location.pathname === '/') return activeSection === link.id;
+
+    return false;
   };
 
   return (
     <>
-      <nav
-        className="fixed top-6 left-1/2 -translate-x-1/2 w-[calc(100%-32px)] md:w-[calc(100%-64px)] max-w-[1280px]
-                   flex justify-between items-center px-4 md:px-8 py-3
-                   bg-glass-bg backdrop-blur-glass border border-glass-border shadow-glass
-                   rounded-pill z-[9999]"
-      >
-        <div
-          className="flex items-center z-50 cursor-pointer group"
-          onClick={(e) => handleNavClick(e, NAV_LINKS[0])}
-        >
-          <div
-            className="relative h-10 rounded-full border border-white/20 bg-gradient-to-br from-white/10 to-white/5 shadow-neon
-                       flex items-center transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] overflow-hidden
-                       w-10 md:group-hover:w-[135px] hover:border-accent/50"
-          >
+      <nav className="fixed top-6 left-1/2 -translate-x-1/2 w-[calc(100%-32px)] md:w-[calc(100%-64px)] max-w-[1280px]
+                      flex justify-between items-center px-4 md:px-8 py-3
+                      bg-glass-bg backdrop-blur-glass border border-glass-border shadow-glass
+                      rounded-pill z-[9999]">
+        <div className="flex items-center z-50 cursor-pointer group" onClick={(e) => handleNavClick(e, { type: 'scroll', id: 'home' })}>
+          <div className="relative h-10 rounded-full border border-white/20 bg-gradient-to-br from-white/10 to-white/5 shadow-neon
+                          flex items-center transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] overflow-hidden
+                          w-10 md:group-hover:w-[135px] hover:border-accent/50">
             <div className="absolute left-0 w-10 h-10 flex items-center justify-center">
               <span className="text-lg font-bold text-white font-heading md:group-hover:text-accent transition-colors">
                 D
@@ -130,11 +155,7 @@ const Navbar = () => {
                   href={href}
                   onClick={(e) => handleNavClick(e, link)}
                   className={`text-[13px] lg:text-[15px] font-medium tracking-wide relative transition-colors duration-300
-                    ${
-                      active
-                        ? 'text-white font-semibold drop-shadow-[0_0_12px_rgba(164,58,217,0.8)]'
-                        : 'text-text-muted hover:text-white'
-                    }
+                    ${active ? 'text-white font-semibold drop-shadow-[0_0_12px_rgba(164,58,217,0.8)]' : 'text-text-muted hover:text-white'}
                     after:content-[''] after:absolute after:-bottom-1.5 after:left-1/2 after:-translate-x-1/2
                     after:h-[2px] after:bg-accent after:transition-all after:duration-300 after:rounded-sm
                     ${active ? 'after:w-full shadow-[0_0_8px_var(--accent-primary)]' : 'after:w-0 hover:after:w-full'}
@@ -148,25 +169,6 @@ const Navbar = () => {
         </ul>
 
         <div className="flex gap-4 items-center z-10">
-          <a
-            href="#contact"
-            onClick={(e) => {
-              e.preventDefault();
-              setIsMobileMenuOpen(false);
-
-              if (location.pathname !== '/') {
-                navigate('/', { state: { scrollTo: 'contact' } });
-                return;
-              }
-              scrollToId('contact');
-            }}
-            className="hidden md:inline-flex px-6 py-2.5 bg-accent/20 border border-accent/40 rounded-pill
-                       text-white text-sm font-semibold hover:bg-accent hover:border-accent
-                       shadow-neon transition-all duration-300 hover-lift no-underline"
-          >
-            Contact Me
-          </a>
-
           <button
             className="md:hidden text-white text-2xl bg-transparent border-none cursor-pointer p-1"
             onClick={() => setIsMobileMenuOpen((v) => !v)}
@@ -211,25 +213,6 @@ const Navbar = () => {
               </li>
             );
           })}
-
-          <li>
-            <a
-              href="#contact"
-              onClick={(e) => {
-                e.preventDefault();
-                setIsMobileMenuOpen(false);
-
-                if (location.pathname !== '/') {
-                  navigate('/', { state: { scrollTo: 'contact' } });
-                  return;
-                }
-                scrollToId('contact');
-              }}
-              className="inline-block mt-4 px-8 py-3 bg-accent text-white font-bold rounded-full shadow-neon"
-            >
-              Contact Me
-            </a>
-          </li>
         </ul>
       </div>
     </>
@@ -237,5 +220,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-
-

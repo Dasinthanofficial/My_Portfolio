@@ -18,18 +18,22 @@ function getNavOffset() {
   return window.innerWidth >= 768 ? 120 : 110;
 }
 
+// Layout wraps common UI for every route
 function Layout() {
   const location = useLocation();
-  const prevKey = useRef(location.key);
+  const prevPath = useRef(location.pathname);
 
-  // Scroll to top ONLY on real route changes, and never when scrollTo exists
+  // ✅ IMPORTANT: Only scroll-to-top when PATH changes (not when state changes)
   useEffect(() => {
-    if (prevKey.current === location.key) return;
-    prevKey.current = location.key;
+    const pathChanged = prevPath.current !== location.pathname;
+    if (!pathChanged) return;
+    prevPath.current = location.pathname;
 
+    // If we're navigating home to scroll to a section, do NOT force top
     if (location.state?.scrollTo) return;
+
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-  }, [location.key, location.state]);
+  }, [location.pathname, location.state]);
 
   // Reveal animation re-init on route change
   useEffect(() => {
@@ -62,12 +66,13 @@ function HomePage() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  // ✅ Robust scroll after navigating to "/" with state.scrollTo
   useLayoutEffect(() => {
     const targetId = location.state?.scrollTo;
     if (!targetId) return;
 
     let tries = 0;
-    const maxTries = 80; // more reliable on slow devices
+    const maxTries = 80;
 
     const scrollNow = () => {
       const navHeight = getNavOffset();
@@ -89,7 +94,6 @@ function HomePage() {
       return true;
     };
 
-    // wait 1 paint then try + retry
     const raf = requestAnimationFrame(() => {
       if (scrollNow()) return;
 
@@ -98,7 +102,6 @@ function HomePage() {
         if (scrollNow() || tries >= maxTries) clearInterval(timer);
       }, 50);
 
-      // cleanup interval
       return () => clearInterval(timer);
     });
 
