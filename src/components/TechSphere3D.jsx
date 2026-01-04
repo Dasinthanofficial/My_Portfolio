@@ -6,7 +6,6 @@ const TechSphere3D = () => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const containerRef = useRef(null);
 
-  // Detect mobile once (enough for most cases)
   const isMobile = useMemo(() => {
     if (typeof window === 'undefined') return false;
     return window.matchMedia('(max-width: 640px)').matches;
@@ -41,37 +40,39 @@ const TechSphere3D = () => {
     setMousePos({ x, y });
   };
 
-  // If user scrolls on mobile, keep it calm (optional)
   useEffect(() => {
     if (!isMobile) return;
     setMousePos({ x: 0, y: 0 });
   }, [isMobile]);
 
-  // Responsive sizes
-  const sphereSize = isMobile ? 220 : 300;
-  const ring1Radius = isMobile ? 85 : 120;
-  const ring2Radius = isMobile ? 135 : 190;
+  // ✅ smaller on mobile
+  const sphereSize = isMobile ? 190 : 300;
+  const ring1Radius = isMobile ? 70 : 120;
+  const ring2Radius = isMobile ? 108 : 190;
 
-  const ring1Bubble = isMobile ? 46 : 60;
-  const ring2Bubble = isMobile ? 36 : 45;
+  const ring1Bubble = isMobile ? 40 : 60;
+  const ring2Bubble = isMobile ? 32 : 45;
 
-  const ring1Icon = isMobile ? 22 : 28;
-  const ring2Icon = isMobile ? 16 : 20;
+  const ring1Icon = isMobile ? 18 : 28;
+  const ring2Icon = isMobile ? 15 : 20;
 
   return (
     <div
       ref={containerRef}
       onPointerMove={handlePointerMove}
       onPointerLeave={() => setMousePos({ x: 0, y: 0 })}
-      className="w-full h-[240px] sm:h-[300px] md:h-[500px] flex justify-center items-center relative
-                 perspective-[1000px] overflow-visible"
+      className="
+        w-full flex justify-center items-center relative perspective-[1000px]
+        h-[220px] sm:h-[260px] md:h-[500px]
+        overflow-visible
+      "
     >
       <div
-        className="relative transition-transform duration-100 ease-out [transform-style:preserve-3d]"
+        className="relative transition-transform duration-150 ease-out [transform-style:preserve-3d]"
         style={{
           width: `${sphereSize}px`,
           height: `${sphereSize}px`,
-          transform: `rotateY(${mousePos.x * 22}deg) rotateX(${mousePos.y * -22}deg)`,
+          transform: `rotateY(${mousePos.x * 18}deg) rotateX(${mousePos.y * -18}deg)`,
         }}
       >
         {icons.map((item, index) => {
@@ -83,23 +84,21 @@ const TechSphere3D = () => {
 
           const x = Math.cos(angle) * radius;
           const y = Math.sin(angle) * radius;
-          const z = item.ring === 1 ? 0 : -25;
+          const z = item.ring === 1 ? 0 : -18;
 
           const bubble = item.ring === 1 ? ring1Bubble : ring2Bubble;
           const iconSize = item.ring === 1 ? ring1Icon : ring2Icon;
 
           return (
             <div
-              key={index}
+              key={`${item.name}-${index}`}
               className="absolute top-1/2 left-1/2 flex justify-center items-center
-                         bg-white/5 backdrop-blur-[5px] border border-white/10 rounded-full
-                         animate-[floatSphere_4s_ease-in-out_infinite_alternate]"
+                         bg-white/5 backdrop-blur-[5px] border border-white/10 rounded-full"
               style={{
                 width: `${bubble}px`,
                 height: `${bubble}px`,
                 transform: `translate(-50%, -50%) translate3d(${x}px, ${y}px, ${z}px)`,
-                boxShadow: `0 0 15px ${item.color}22`,
-                animationDuration: `${4 + index * 0.4}s`,
+                boxShadow: `0 0 12px ${item.color}22`,
               }}
             >
               <item.Icon style={{ fontSize: `${iconSize}px`, color: item.color }} />
@@ -110,19 +109,12 @@ const TechSphere3D = () => {
         <div
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
                      text-white font-bold tracking-[2px] pointer-events-none
-                     drop-shadow-[0_0_20px_rgba(164,58,217,0.8)]"
-          style={{ fontSize: isMobile ? '14px' : '16px' }}
+                     drop-shadow-[0_0_18px_rgba(164,58,217,0.7)]"
+          style={{ fontSize: isMobile ? '12px' : '16px' }}
         >
           STACK
         </div>
       </div>
-
-      <style>{`
-        @keyframes floatSphere {
-          0% { margin-top: -10px; }
-          100% { margin-top: 10px; }
-        }
-      `}</style>
     </div>
   );
 };
