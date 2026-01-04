@@ -223,39 +223,32 @@ const ContactSection = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSent, setIsSent] = useState(false);
 
-  // Build redirect URL safely (works on Vercel/custom domain)
+  // ✅ Correct redirect format: query BEFORE hash
   const redirectUrl = useMemo(() => {
     if (typeof window === 'undefined') return '';
-    // come back to the same page, jump to contact, add sent=1
-    return `${window.location.origin}${window.location.pathname}#contact?sent=1`;
+    return `${window.location.origin}${window.location.pathname}?sent=1#contact`;
   }, []);
 
-  // Detect success after Formspree redirects back
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    // Formspree will redirect us to something like "...#contact?sent=1" (hash contains query)
-    const hash = window.location.hash || '';
-    const hasSent =
-      hash.includes('sent=1') || new URLSearchParams(window.location.search).get('sent') === '1';
+    const sent = new URLSearchParams(window.location.search).get('sent') === '1';
+    if (!sent) return;
 
-    if (hasSent) {
-      setIsSent(true);
-      setFormData({ name: '', email: '', message: '' });
+    setIsSent(true);
+    setFormData({ name: '', email: '', message: '' });
 
-      // Clean the URL so refresh doesn't keep showing success
-      // Keep #contact for UX
-      window.history.replaceState({}, '', `${window.location.pathname}#contact`);
+    // clean URL (keep #contact)
+    window.history.replaceState({}, '', `${window.location.pathname}#contact`);
 
-      const t = window.setTimeout(() => setIsSent(false), 5000);
-      return () => window.clearTimeout(t);
-    }
+    const t = window.setTimeout(() => setIsSent(false), 5000);
+    return () => window.clearTimeout(t);
   }, []);
 
   const handleChange = (e) => setFormData((p) => ({ ...p, [e.target.name]: e.target.value }));
 
-  // Native submit: we only set a loading state (page will navigate)
   const handleSubmit = () => {
+    // native submit will navigate away; this just updates UI instantly
     setIsSubmitting(true);
   };
 
@@ -324,7 +317,6 @@ const ContactSection = () => {
             </div>
           )}
 
-          {/* ✅ Native Formspree submit (no fetch/CORS issues) */}
           <form
             action={FORMSPREE_ENDPOINT}
             method="POST"
@@ -332,7 +324,6 @@ const ContactSection = () => {
             className="flex flex-col gap-6 relative z-10"
           >
             <input type="hidden" name="_subject" value="New message from portfolio contact form" />
-            {/* Redirect back to your site after submit */}
             <input type="hidden" name="_redirect" value={redirectUrl} />
 
             <div className="group">
