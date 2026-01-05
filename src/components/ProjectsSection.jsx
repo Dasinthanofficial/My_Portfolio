@@ -42,11 +42,14 @@ const ProjectsSection = ({
       ],
     },
     {
-      title: 'Real-time Chat',
-      desc: 'Live messaging using Socket.io.',
-      tags: ['Socket.io', 'Node.js', 'React'],
-      demoUrl: 'https://your-demo-link.com',
-      githubUrl: 'https://github.com/yourname/repo2',
+      title: 'Live Weather Checker',
+      desc: 'Real-time weather app with city search',
+      tags: ['React','openWeatherMap API','Tailwind CSS'],
+      demoUrl: 'https://weather-woad-three-53.vercel.app/',
+       githubLinks: [
+        { label: 'Frontend', url: 'https://github.com/Dasinthanofficial/Weather_checker_location_based.git' },
+        { label: 'Backend', url: '' },
+      ],
     },
     {
       title: 'Python File Organizer',

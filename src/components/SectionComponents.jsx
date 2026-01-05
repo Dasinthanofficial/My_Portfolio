@@ -1,11 +1,19 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import Tilt from 'react-parallax-tilt';
 
 export const GlassCard = ({ children, className = '', hoverEffect = false, ...props }) => {
+  const disableTilt = useMemo(() => {
+    if (typeof window === 'undefined') return true;
+    const coarse = window.matchMedia('(pointer: coarse)').matches;
+    const noHover = window.matchMedia('(hover: none)').matches;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    return coarse || noHover || reduce;
+  }, []);
+
   const CardContent = (
     <div
       className={`
-        bg-glass-bg backdrop-blur-glass border border-glass-border rounded-card p-8 
+        bg-glass-bg backdrop-blur-glass border border-glass-border rounded-card p-6 sm:p-8
         shadow-glass relative overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]
         ${hoverEffect ? 'hover:border-accent/30' : ''} 
         ${className}
@@ -17,7 +25,9 @@ export const GlassCard = ({ children, className = '', hoverEffect = false, ...pr
     </div>
   );
 
-  return hoverEffect ? (
+  if (!hoverEffect || disableTilt) return CardContent;
+
+  return (
     <Tilt
       tiltMaxAngleX={10}
       tiltMaxAngleY={10}
@@ -25,26 +35,16 @@ export const GlassCard = ({ children, className = '', hoverEffect = false, ...pr
       scale={1.02}
       transitionSpeed={1000}
       className="h-full"
+      gyroscope={false}
     >
       {CardContent}
     </Tilt>
-  ) : (
-    CardContent
   );
 };
 
-export const SectionTitle = ({
-  title,
-  subtitle,
-  centered = true,
-  id,
-  className = '', // ✅ allow custom spacing
-}) => {
+export const SectionTitle = ({ title, subtitle, centered = true, id, className = '' }) => {
   return (
-    <div
-      id={id}
-      className={`mb-16 relative z-10 ${centered ? 'text-center' : 'text-left'} ${className}`}
-    >
+    <div id={id} className={`mb-14 sm:mb-16 relative z-10 ${centered ? 'text-center' : 'text-left'} ${className}`}>
       {subtitle && (
         <span
           className="block text-accent text-sm font-bold tracking-[3px] mb-3 uppercase 
@@ -54,18 +54,15 @@ export const SectionTitle = ({
         </span>
       )}
 
-      <h2
-        className="text-5xl font-extrabold text-white m-0 tracking-tight 
-                   drop-shadow-[0_2px_20px_rgba(164,58,217,0.3)] font-heading"
-      >
+      <h2 className="text-4xl sm:text-5xl font-extrabold text-white m-0 tracking-tight drop-shadow-[0_2px_20px_rgba(164,58,217,0.3)] font-heading">
         {title}
       </h2>
 
       <div
         className={`
-          absolute top-1/2 -translate-y-1/2 w-[300px] h-[100px] 
+          absolute top-1/2 -translate-y-1/2 w-[240px] sm:w-[300px] h-[90px] sm:h-[100px]
           bg-[radial-gradient(ellipse_at_center,rgba(164,58,217,0.25)_0%,transparent_70%)] 
-          blur-[50px] -z-10 pointer-events-none
+          blur-[45px] sm:blur-[50px] -z-10 pointer-events-none
           ${centered ? 'left-1/2 -translate-x-1/2' : 'left-0'}
         `}
       />

@@ -36,20 +36,9 @@ const ParticleField = ({ count = 2000 }) => {
   return (
     <points ref={points}>
       <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          count={particles.positions.length / 3}
-          array={particles.positions}
-          itemSize={3}
-        />
-        <bufferAttribute
-          attach="attributes-color"
-          count={particles.colors.length / 3}
-          array={particles.colors}
-          itemSize={3}
-        />
+        <bufferAttribute attach="attributes-position" count={particles.positions.length / 3} array={particles.positions} itemSize={3} />
+        <bufferAttribute attach="attributes-color" count={particles.colors.length / 3} array={particles.colors} itemSize={3} />
       </bufferGeometry>
-
       <pointsMaterial size={0.015} vertexColors transparent opacity={0.6} sizeAttenuation />
     </points>
   );
@@ -67,7 +56,7 @@ const GalaxyBackground = () => {
   );
 
   if (reduceMotion) {
-    return <div className="fixed inset-0 w-full h-full z-[-2] bg-bg0 pointer-events-none" />;
+    return <div className="fixed inset-0 z-[-2] bg-bg0 pointer-events-none overflow-hidden" />;
   }
 
   const starsCount = isMobile ? 1500 : 5000;
@@ -75,19 +64,13 @@ const GalaxyBackground = () => {
   const pStatic = isMobile ? 300 : 1000;
 
   return (
-    <div className="fixed inset-0 w-full h-full z-[-2] bg-bg0 pointer-events-none">
-      <Canvas
-        camera={{ position: [0, 0, 5], fov: 60 }}
-        dpr={isMobile ? 1 : [1, 1.5]}
-      >
+    <div className="fixed inset-0 z-[-2] bg-bg0 pointer-events-none overflow-hidden">
+      <Canvas camera={{ position: [0, 0, 5], fov: 60 }} dpr={isMobile ? 1 : [1, 1.5]}>
         <ambientLight intensity={0.5} />
-
         <Stars radius={100} depth={50} count={starsCount} factor={4} saturation={0} fade speed={0.7} />
-
         <Float speed={1.5} rotationIntensity={0.35} floatIntensity={0.35}>
           <ParticleField count={pFloat} />
         </Float>
-
         <ParticleField count={pStatic} />
       </Canvas>
     </div>
