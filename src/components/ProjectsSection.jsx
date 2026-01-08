@@ -196,6 +196,7 @@ import { useNavigate } from 'react-router-dom';
 import { GlassCard, SectionTitle } from './SectionComponents';
 import { Button } from './Buttons';
 import reminexImg from '../assets/reminex.png';
+import form from '../assets/form.png';
 
 const normalizeUrl = (url) => {
   const u = (url ?? '').toString().trim();
@@ -258,10 +259,15 @@ const ProjectsSection = ({
       ],
     },
     {
-      title: 'Python File Organizer',
-      desc: 'Script to automatically sort files by extension.',
-      tags: ['Python', 'Automation'],
-      githubUrl: 'https://github.com/yourname/repo5', // used as Frontend fallback
+      title: 'React Simple Form',
+      desc: '',
+      tags: ['React', 'Tailwind CSS'],
+      demoUrl: 'https://react-simple-form-eta.vercel.app/',
+      image: form,
+      githubLinks: [
+        { label: 'Frontend', url: 'https://github.com/Dasinthanofficial/React_simple_form.git' },
+        { label: 'Backend', url: '' }, // Backend button will show N/A (disabled)
+      ],
     },
   ];
 
@@ -336,9 +342,8 @@ const ProjectsSection = ({
                       {proj.tags.map((tag, idx) => (
                         <span
                           key={`${tag}-${idx}`}
-                          className={`text-[11px] uppercase tracking-wider font-bold ${
-                            idx === 0 ? 'text-accent' : 'text-text-muted'
-                          }`}
+                          className={`text-[11px] uppercase tracking-wider font-bold ${idx === 0 ? 'text-accent' : 'text-text-muted'
+                            }`}
                         >
                           {tag}
                         </span>
