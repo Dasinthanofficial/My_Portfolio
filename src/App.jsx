@@ -5,7 +5,6 @@ import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
 import AboutSection from './components/AboutSection';
 import SkillsSection from './components/SkillsSection';
-import ServicesSection from './components/ServicesSection';
 import ProjectsSection from './components/ProjectsSection';
 import { ContactSection } from './components/ContactSection';
 import ContainerPanel from './components/ContainerPanel';
@@ -114,7 +113,6 @@ function HomePage() {
       <div className="reveal"><AboutSection /></div>
       <div className="reveal"><SkillsSection /></div>
       <div className="reveal"><CertificationsSection limit={2} showViewMore /></div>
-      <div className="reveal"><ServicesSection /></div>
       <div className="reveal"><ProjectsSection limit={3} showViewMore /></div>
       <div className="reveal"><ContactSection /></div>
     </>

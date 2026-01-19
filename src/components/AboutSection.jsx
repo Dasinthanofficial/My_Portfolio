@@ -29,8 +29,7 @@ const AboutSection = () => {
               </h3>
 
               <p className="text-text-muted leading-relaxed mb-6 text-[15px]">
-                I am a passionate Developer with a strong command of the MERN stack. My journey started with Python
-                scripting and has evolved into building scalable, full-featured web applications.
+                I’m a passionate developer with a strong command of the MERN stack, focused on building scalable, full-featured web applications from the ground up.
               </p>
 
               <div
@@ -46,9 +45,8 @@ const AboutSection = () => {
         </GlassCard>
 
         <div className="grid grid-cols-2 gap-6">
-          <StatCard number="10+" label="Mini Projects" />
           <StatCard number="MERN" label="Stack Specialist" isAccent />
-          <StatCard number="Python" label="Scripting Basics" />
+          <StatCard number="Python" label="Basics" />
           <StatCard number="AWS" label="Cloud Basics" isAccent />
         </div>
       </div>
@@ -60,11 +58,10 @@ const StatCard = ({ number, label, isAccent = false }) => (
   <GlassCard hoverEffect className="flex flex-col justify-center items-center text-center py-8">
     <h4
       className={`text-[42px] font-bold mb-1 font-heading 
-      ${
-        isAccent
+      ${isAccent
           ? 'text-accent drop-shadow-[0_0_15px_rgba(164,58,217,0.5)]'
           : 'text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]'
-      }`}
+        }`}
     >
       {number}
     </h4>

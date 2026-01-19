@@ -5,7 +5,6 @@ const NAV_LINKS = [
   { name: 'Home', type: 'scroll', id: 'home' },
   { name: 'About', type: 'scroll', id: 'about' },
   { name: 'Skills', type: 'scroll', id: 'skills' },
-  { name: 'Services', type: 'scroll', id: 'services' },
   { name: 'Contact', type: 'scroll', id: 'contact' },
   { name: 'Certifications', type: 'route', to: '/certifications' },
   { name: 'My Projects', type: 'route', to: '/projects' },
@@ -25,7 +24,7 @@ const Navbar = () => {
 
   const observerRef = useRef(null);
 
-  const HOME_SECTION_IDS = useMemo(() => ['home', 'about', 'skills', 'services', 'contact'], []);
+  const HOME_SECTION_IDS = useMemo(() => ['home', 'about', 'skills', 'contact'], []);
 
   useEffect(() => {
     const handleProgress = () => {
