@@ -26,14 +26,14 @@ const CertificationsSection = ({
       icon: <FaFreeCodeCamp />,
       color: 'text-white',
     },
-    {
-      title: 'Google Sheets',
-      issuer: 'Alison',
-      date: 'Issued 2025',
-      link: 'https://alison.com/',
-      icon: <SiGooglesheets />,
-      color: 'text-[#34A853]',
-    },
+    // {
+    //   title: 'Google Sheets',
+    //   issuer: 'Alison',
+    //   date: 'Issued 2025',
+    //   link: 'https://alison.com/',
+    //   icon: <SiGooglesheets />,
+    //   color: 'text-[#34A853]',
+    // },
   ];
 
   const visibleCerts = typeof limit === 'number' ? certifications.slice(0, limit) : certifications;
